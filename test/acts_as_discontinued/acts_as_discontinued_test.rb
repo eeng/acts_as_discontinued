@@ -1,4 +1,4 @@
-require 'test/unit'
+require 'minitest/autorun'
 require 'active_record'
 require "#{File.dirname(__FILE__)}/../../lib/acts_as_discontinued"
 
@@ -32,14 +32,14 @@ class Product < ActiveRecord::Base
   belongs_to :category
 end
 
-class ActsAsDiscontinuedTest < Test::Unit::TestCase
+class ActsAsDiscontinuedTest < Minitest::Test
   def test_should_set_discontinued_at_when_discontinued!
-    assert_not_nil Product.create!.discontinue!.reload.discontinued_at
+    assert Product.create!.discontinue!.reload.discontinued_at != nil
   end
   
   def test_should_unset_discontinued_at_when_activate!
     p = Product.create! discontinued_at: Time.now
-    assert_not_nil p.discontinued_at
+    assert p.discontinued_at != nil
     p.activate!
     assert_nil p.reload.discontinued_at
   end
@@ -58,7 +58,7 @@ class ActsAsDiscontinuedTest < Test::Unit::TestCase
     assert_equal 2, Product.status(:active).size
     assert_equal 2, Product.status(nil).size
     assert_equal 1, Product.status(:inactive).size
-    assert_equal 1, Product.status(:inactive).find(:all, joins: :category).size
+    assert_equal 1, Product.status(:inactive).joins(:category).size
   end
 
   def test_scope_should_work_on_strings

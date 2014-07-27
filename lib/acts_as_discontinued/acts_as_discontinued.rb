@@ -7,16 +7,16 @@ module ActsAsDiscontinued
     def acts_as_discontinued(options = {})
       include InstanceMethods
       class_eval do
-        scope :active, :conditions => {:discontinued_at => nil}
-        scope :status, lambda { |*args|
-          stat = args.first.to_s
-          case stat
+        scope :active, -> { where discontinued_at: nil }
+        scope :inactive, -> { where.not discontinued_at: nil }
+        scope :status, -> stat {
+          case stat.to_s
           when 'active', ''
-            {:conditions => {:discontinued_at => nil}}
+            active
           when 'inactive'
-            {:conditions => "#{table_name}.discontinued_at is not null"}
+            inactive
           else
-            {}
+            all
           end 
         }
       end
